@@ -29,8 +29,5 @@
   ],
   "env": {
     "REACT_APP_API_URL": "https://url-shortener-fr9d.onrender.com"
-  },
-  "buildCommand": "npm run build",
-  "outputDirectory": "build",
-  "installCommand": "npm install"
+  }
 } 
