@@ -6,9 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js",
-    "build": "echo 'No build step required'",
-    "test": "echo 'No tests specified'"
+    "dev": "nodemon server.js"
   },
   "keywords": ["url-shortener", "api", "nodejs", "express"],
   "author": "Your Name",
