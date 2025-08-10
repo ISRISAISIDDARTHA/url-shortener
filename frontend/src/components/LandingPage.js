@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-axios.defaults.baseURL = 'http://localhost:5000';
+
+// Use environment variable or fallback to deployed backend
+const API_URL = process.env.REACT_APP_API_URL || 'https://url-shortener-fr9d.onrender.com';
+axios.defaults.baseURL = API_URL;
 
 const LandingPage = () => {
   const { user, logout } = useAuth();
