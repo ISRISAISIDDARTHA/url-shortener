@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import urlRoutes from "./routes/urlRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import { redirectToUrl } from "./controllers/urlController.js";
 
 dotenv.config();
 const app = express();
@@ -16,8 +17,8 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const corsOptions = {
   origin: NODE_ENV === 'production' 
     ? [
-        'https://your-frontend-domain.vercel.app', // Update this with your actual frontend URL
-        'https://your-frontend-domain.netlify.app' // Update this with your actual frontend URL
+        'https://url-shortener-rust-six.vercel.app', // Your Vercel frontend
+        'https://url-shortener-fr9d.onrender.com'   // Your Render backend
       ]
     : ['http://localhost:3000', 'http://localhost:3001'],
   credentials: true,
@@ -50,10 +51,45 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Root route - API information
+app.get("/", (req, res) => {
+  res.json({
+    message: "URL Shortener API",
+    version: "1.0.0",
+    endpoints: {
+      health: "/health",
+      auth: "/api/auth",
+      urls: "/api/urls",
+      redirect: "/:urlCode"
+    },
+    documentation: "Visit /health for API status"
+  });
+});
+
 // API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/urls", urlRoutes);
-app.use("/", urlRoutes); // Root route for redirects
+
+// Redirect route for short URLs (must be last to catch short URL codes)
+app.get("/:urlCode", (req, res) => {
+  redirectToUrl(req, res);
+});
+
+// 404 handler for undefined routes
+app.use("*", (req, res) => {
+  res.status(404).json({
+    error: "Route not found",
+    message: `Cannot ${req.method} ${req.originalUrl}`,
+    availableEndpoints: [
+      "GET /",
+      "GET /health", 
+      "POST /api/auth/register",
+      "POST /api/auth/login",
+      "POST /api/urls",
+      "GET /:urlCode"
+    ]
+  });
+});
 
 // Start server with error handling
 const startServer = async () => {
