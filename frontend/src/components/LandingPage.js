@@ -7,6 +7,11 @@ import axios from 'axios';
 const API_URL = process.env.REACT_APP_API_URL || 'https://url-shortener-fr9d.onrender.com';
 axios.defaults.baseURL = API_URL;
 
+// Debug logging
+console.log('🔗 Frontend connecting to backend:', API_URL);
+console.log('🌍 Environment:', process.env.NODE_ENV);
+console.log('📡 REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+
 const LandingPage = () => {
   const { user, logout } = useAuth();
   const [formData, setFormData] = useState({
@@ -33,11 +38,28 @@ const LandingPage = () => {
     setSuccess('');
 
     try {
+      console.log('🚀 Making API call to:', `${axios.defaults.baseURL}/api/urls/public`);
+      console.log('📤 Sending data:', formData);
+      
       const response = await axios.post('/api/urls/public', formData);
+      
+      console.log('✅ API call successful:', response.data);
       setShortUrl(response.data.shortUrl);
       setSuccess('URL shortened successfully!');
       setFormData({ originalUrl: '', title: '', description: '' });
     } catch (error) {
+      console.error('❌ API call failed:', error);
+      console.error('📡 Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          baseURL: error.config?.baseURL,
+          method: error.config?.method
+        }
+      });
+      
       setError(error.response?.data?.message || 'Failed to create short URL');
     } finally {
       setLoading(false);

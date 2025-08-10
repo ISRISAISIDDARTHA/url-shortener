@@ -15,18 +15,37 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // CORS configuration for production
 const corsOptions = {
-  origin: NODE_ENV === 'production' 
-    ? [
-        'https://url-shortener-rust-six.vercel.app', // Your Vercel frontend
-        'https://url-shortener-fr9d.onrender.com'   // Your Render backend
-      ]
-    : ['http://localhost:3000', 'http://localhost:3001'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = NODE_ENV === 'production' 
+      ? [
+          'https://url-shortener-g360rjy9b-inabathini-sri-sai-siddarthas-projects.vercel.app', // Your actual Vercel frontend
+          'https://url-shortener-rust-six.vercel.app', // Keep old domain as backup
+          'https://url-shortener-fr9d.onrender.com'   // Your Render backend
+        ]
+      : ['http://localhost:3000', 'http://localhost:3001'];
+    
+    console.log(`🌐 CORS check - Origin: ${origin}, Allowed: ${allowedOrigins.includes(origin)}`);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log(`❌ CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };
 
 // Middleware
 app.use(cors(corsOptions));
+
+// Additional CORS headers for preflight requests
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
 
 // Security headers
